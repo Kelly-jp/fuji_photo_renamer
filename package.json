@@ -22,7 +22,9 @@
       "main.js",
       "preload.js",
       "index.html",
-      "assets/**/*"
+      "assets/**/*",
+      "LICENSE",
+      "package.json"
     ],
     "extraResources": [
       {
