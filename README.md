@@ -93,12 +93,8 @@ npm run build-win
 - .jpg, .jpeg
 
 ### RAW
-- .cr2, .cr3 (Canon)
-- .nef (Nikon)
-- .arw (Sony)
-- .orf (Olympus)
-- .rw2 (Panasonic)
-- .dng (Adobe)
+- .raf (FUJIFILM)
+- .dng (Adobe, DxO)
 
 ### XMP
 - .xmp (Adobe Lightroom)
