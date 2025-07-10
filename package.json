@@ -1,0 +1,82 @@
+{
+  "name": "fuji-photo-renamer",
+  "version": "1.0.0",
+  "description": "富士フイルムの写真ファイルリネームツール",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build-mac": "electron-builder --mac",
+    "build-win": "electron-builder --win",
+    "build-all": "electron-builder --mac --win",
+    "create-zip": "node create-zip.js"
+  },
+  "build": {
+    "appId": "com.fujiphotorenamer.app",
+    "productName": "FUJI Photo Renamer",
+    "icon": "assets/icon.png",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "assets/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "node_modules/exiftool-vendored.pl/bin/",
+        "to": "bin",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.photography",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    }
+  },
+  "devDependencies": {
+    "electron": "^37.2.0",
+    "electron-builder": "^24.6.4",
+    "archiver": "^6.0.1"
+  },
+  "dependencies": {
+    "exiftool-vendored": "^25.0.0",
+    "fast-xml-parser": "^4.3.2",
+    "fs-extra": "^11.3.0"
+  }
+}

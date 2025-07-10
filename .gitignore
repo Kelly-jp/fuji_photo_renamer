@@ -1,3 +1,23 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment files
+.env
+.env.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
 # Logs
 logs
 *.log
@@ -52,6 +72,19 @@ web_modules/
 
 # Optional eslint cache
 .eslintcache
+
+# Electron build cache
+.electron-gyp
+
+# Build artifacts
+*.dmg
+*.exe
+*.deb
+*.rpm
+*.pkg
+
+# Backup files
+backup/
 
 # Optional stylelint cache
 .stylelintcache

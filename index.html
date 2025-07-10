@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FUJI Photo Renamer</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 10px; /* 20pxから変更 */
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px; /* 30pxから変更 */
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px; /* 30pxから変更 */
+        }
+        
+        .section {
+            margin-bottom: 25px;
+            padding: 15px; /* 20pxから変更 */
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        
+        .section h3 {
+            margin-top: 0;
+            color: #555;
+        }
+        
+        .folder-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .folder-input input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        button {
+            padding: 8px 16px;
+            background: #007AFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background: #0056CC;
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .clear-btn {
+            background: #FF3B30;
+            padding: 8px 12px; /* 少し小さく調整 */
+            font-size: 14px;
+        }
+        
+        .clear-btn:hover {
+            background: #D70015;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .exclude-list {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+        }
+        
+        .exclude-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .exclude-item:last-child {
+            border-bottom: none;
+        }
+        
+        .exclude-item input {
+            flex: 1;
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        
+        .remove-btn {
+            background: #FF3B30;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .add-exclude-btn {
+            margin-top: 10px;
+            background: #34C759;
+        }
+        
+        .add-exclude-btn:hover {
+            background: #248A3D;
+        }
+        
+        .convert-btn {
+            display: block;
+            width: 80%;
+            max-width: 450px;
+            margin: 15px auto; /* 20px autoから変更 */
+            padding: 10px 20px; /* 15px 30pxから変更 */
+            background: #FF9500;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 8px;
+        }
+        
+        .convert-btn:hover {
+            background: #CC7700;
+        }
+
+        .cancel-btn {
+            background: #FF3B30 !important;
+        }
+
+        .cancel-btn:hover {
+            background: #D70015 !important;
+        }
+        
+        .log-area {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            background: #f8f8f8;
+            font-family: monospace;
+            font-size: 12px;
+            height: 150px; /* 200pxから変更 */
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #4CAF50;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        
+        .progress-text {
+            text-align: center;
+            margin-top: 5px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .hidden {
+            display: none;
+        }
+
+        details.advanced-settings {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            background: #fafafa;
+        }
+        
+        details.advanced-settings > .section {
+            border: none;
+            padding-top: 0;
+        }
+
+        summary {
+            padding: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #555;
+            outline: none;
+            list-style: none; /* Remove default marker */
+        }
+
+        summary::-webkit-details-marker {
+            display: none; /* For Chrome */
+        }
+
+        summary::before {
+            content: '▶';
+            margin-right: 10px;
+            font-size: 0.8em;
+            transition: transform 0.2s;
+        }
+
+        details[open] > summary::before {
+            transform: rotate(90deg);
+        }
+
+        .format-editor {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #format-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            box-sizing: border-box; /* 追加 */
+        }
+
+        .tag-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag-buttons button {
+            background: #eee;
+            color: #333;
+            font-size: 12px;
+        }
+
+        .tag-buttons button:hover {
+            background: #ddd;
+        }
+
+        .reset-format-btn {
+            padding: 5px 10px;
+            font-size: 12px;
+            background: #6c757d;
+            margin-left: 10px;
+        }
+
+        .reset-format-btn:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><img src="assets/icon.png" alt="FUJI Photo Renamer Icon" style="height: 30px; vertical-align: middle; margin-right: 10px;">FUJI Photo Renamer</h1>
+        
+        <div class="section">
+            <h3>フォルダ選択</h3>
+            <div class="folder-input" id="jpeg-folder">
+                <input type="text" id="jpeg-path" placeholder="JPEGフォルダを選択してください" readonly>
+                <button onclick="selectJpegFolder()">選択</button>
+                <button class="clear-btn" onclick="clearJpegPath()">クリア</button>
+            </div>
+            <div class="folder-input" id="raw-folder">
+                <input type="text" id="raw-path" placeholder="RAWフォルダを選択してください（オプション）" readonly>
+                <button onclick="selectRawFolder()">選択</button>
+                <button class="clear-btn" onclick="clearRawPath()">クリア</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <button class="convert-btn" onclick="startConversion()" id="convert-btn">変換開始</button>
+            
+            <div class="progress-bar hidden" id="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-text hidden" id="progress-text">準備中...</div>
+        </div>
+
+        <details class="advanced-settings">
+            <summary>詳細設定</summary>
+            <div class="section">
+                <h3>オプション</h3>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" id="backup-checkbox" checked onchange="saveSettings()">
+                        リネーム時に元ファイルをバックアップする
+                    </label>
+                    <label>
+                        <input type="checkbox" id="skip-same-lens-checkbox" checked onchange="saveSettings()">
+                        レンズメーカー名がカメラメーカー名と同じ場合は省略する
+                    </label>
+                </div>
+            </div>
+
+            <div class="section">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                    <h3>ファイル名書式</h3>
+                    <button onclick="resetFileNameFormat()" class="reset-format-btn">デフォルトに戻す</button>
+                </div>
+                <div class="format-editor">
+                    <input type="text" id="format-input" onchange="saveSettings()" oninput="validateFileNameFormat(this)">
+                    <div class="tag-buttons">
+                        <button onclick="addTag('{YYYY}')">年</button>
+                        <button onclick="addTag('{MM}')">月</button>
+                        <button onclick="addTag('{DD}')">日</button>
+                        <button onclick="addTag('{HH}')">時</button>
+                        <button onclick="addTag('{mm}')">分</button>
+                        <button onclick="addTag('{ss}')">秒</button>
+                        <button onclick="addTag('{CameraMaker}')">カメラメーカー</button>
+                        <button onclick="addTag('{CameraModel}')">カメラモデル</button>
+                        <button onclick="addTag('{LensMaker}')">レンズメーカー</button>
+                        <button onclick="addTag('{LensModel}')">レンズモデル</button>
+                        <button onclick="addTag('{FilmSimulation}')">フィルムシミュレーション</button>
+                        <button onclick="addTag('{OriginalName}')">元のファイル名</button>
+                    </div>
+                    <div id="format-sample" style="margin-top: 10px; padding: 8px; border: 1px solid #eee; background: #f9f9f9; font-family: monospace; font-size: 14px; color: #555;"></div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>除外文字列</h3>
+                <div class="exclude-list" id="exclude-list">
+                    <!-- 除外文字列項目がここに追加されます -->
+                </div>
+                <button class="add-exclude-btn" onclick="addExcludeItem()">除外文字列を追加</button>
+            </div>
+        </details>
+        
+        <div class="section">
+            <h3>ログ</h3>
+            <div class="log-area" id="log-area"></div>
+        </div>
+    </div>
+
+    <script>
+        let settings = {
+            fileNameFormat: '{YYYY}{MM}{DD}_{HH}{mm}{ss}_{CameraMaker}_{CameraModel}_{LensMaker}_{LensModel}_{FilmSimulation}_{OriginalName}',
+            excludeStrings: ['-強化-NR', '-DxO_DeepPRIME XD2s_XD', '-DxO_DeepPRIME 3'],
+            backup: true,
+            skipSameLensMaker: true
+        };
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadSettings();
+            initializeExcludeList();
+            setupProgressListener();
+            updateFormatSample(); // 初期表示
+        });
+
+        // 設定の読み込み
+        async function loadSettings() {
+            try {
+                const savedSettings = await window.electronAPI.loadSettings();
+                if (savedSettings) {
+                    settings = { ...settings, ...savedSettings };
+                    document.getElementById('backup-checkbox').checked = settings.backup;
+                    document.getElementById('skip-same-lens-checkbox').checked = settings.skipSameLensMaker;
+                    document.getElementById('format-input').value = settings.fileNameFormat;
+                }
+            } catch (error) {
+                console.error('設定の読み込みに失敗:', error);
+            }
+        }
+
+        // 設定の保存
+        async function saveSettings() {
+            try {
+                settings.backup = document.getElementById('backup-checkbox').checked;
+                settings.skipSameLensMaker = document.getElementById('skip-same-lens-checkbox').checked;
+                settings.fileNameFormat = document.getElementById('format-input').value;
+                settings.excludeStrings = getExcludeStrings();
+                await window.electronAPI.saveSettings(settings);
+                updateFormatSample(); // 設定保存時にも更新
+            } catch (error) {
+                console.error('設定の保存に失敗:', error);
+            }
+        }
+
+        // 除外文字列リストの初期化
+        function initializeExcludeList() {
+            const list = document.getElementById('exclude-list');
+            list.innerHTML = '';
+            
+            settings.excludeStrings.forEach(str => {
+                addExcludeItemToList(str);
+            });
+        }
+
+        // 除外文字列項目を追加
+        function addExcludeItem() {
+            addExcludeItemToList('');
+        }
+
+        function addExcludeItemToList(value) {
+            const list = document.getElementById('exclude-list');
+            const item = document.createElement('div');
+            item.className = 'exclude-item';
+            item.innerHTML = `
+                <input type="text" value="${value}" placeholder="除外したい文字列を入力" onblur="saveSettings()">
+                <button class="remove-btn" onclick="removeExcludeItem(this)">削除</button>
+            `;
+            list.appendChild(item);
+        }
+
+        // 除外文字列項目を削除
+        function removeExcludeItem(button) {
+            button.parentElement.remove();
+            saveSettings();
+        }
+
+        // 除外文字列を取得
+        function getExcludeStrings() {
+            const inputs = document.querySelectorAll('.exclude-item input');
+            return Array.from(inputs).map(input => input.value).filter(value => value.trim());
+        }
+
+        // 書式タグを追加
+        function addTag(tag) {
+            const formatInput = document.getElementById('format-input');
+            const start = formatInput.selectionStart;
+            const end = formatInput.selectionEnd;
+            const text = formatInput.value;
+            formatInput.value = text.substring(0, start) + tag + text.substring(end);
+            formatInput.focus();
+            formatInput.setSelectionRange(start + tag.length, start + tag.length);
+            saveSettings();
+        }
+
+        // フォルダ選択
+        async function selectJpegFolder() {
+            const folderPath = await window.electronAPI.selectFolder();
+            if (folderPath) {
+                document.getElementById('jpeg-path').value = folderPath;
+            }
+        }
+
+        async function selectRawFolder() {
+            const folderPath = await window.electronAPI.selectFolder();
+            if (folderPath) {
+                document.getElementById('raw-path').value = folderPath;
+            }
+        }
+
+        // パスをクリア
+        function clearJpegPath() {
+            document.getElementById('jpeg-path').value = '';
+        }
+
+        function clearRawPath() {
+            document.getElementById('raw-path').value = '';
+        }
+
+        // -- 機能しないドラッグ＆ドロップ関連のコードをここから削除 --
+
+        // プログレス表示の設定
+        function setupProgressListener() {
+            window.electronAPI.onProgress((data) => {
+                const progressBar = document.getElementById('progress-bar');
+                const progressFill = document.getElementById('progress-fill');
+                const progressText = document.getElementById('progress-text');
+                
+                progressBar.classList.remove('hidden');
+                progressText.classList.remove('hidden');
+                
+                const percentage = (data.current / data.total) * 100;
+                progressFill.style.width = percentage + '%';
+                progressText.textContent = `${data.current}/${data.total} - ${data.message}`;
+            });
+        }
+
+        // 変換開始
+        async function startConversion() {
+            const jpegPath = document.getElementById('jpeg-path').value;
+            const rawPath = document.getElementById('raw-path').value;
+            
+            if (!jpegPath) {
+                alert('JPEGフォルダを選択してください');
+                return;
+            }
+
+            const convertBtn = document.getElementById('convert-btn');
+            convertBtn.disabled = false; // キャンセルできるように有効化
+            convertBtn.textContent = 'キャンセル';
+            convertBtn.onclick = cancelConversion; // クリックイベントをキャンセルに変更
+            convertBtn.classList.add('cancel-btn'); // キャンセル用のスタイルを適用
+
+            const logArea = document.getElementById('log-area');
+            logArea.textContent = '変換を開始しています...\n';
+
+            try {
+                await saveSettings();
+                
+                const options = {
+                    jpegPath,
+                    rawPath: rawPath || null,
+                    excludeStrings: getExcludeStrings(),
+                    backup: document.getElementById('backup-checkbox').checked,
+                    skipSameLensMaker: document.getElementById('skip-same-lens-checkbox').checked,
+                    fileNameFormat: settings.fileNameFormat // 追加
+                };
+
+                const result = await window.electronAPI.renameFiles(options);
+                
+                if (result.success) {
+                    logArea.textContent += '変換が完了しました！\n\n';
+                    logArea.textContent += '結果:\n';
+                    
+                    result.results.forEach(item => {
+                        if (item.success) {
+                            logArea.textContent += `✓ ${item.oldName} → ${item.newName}\n`;
+                        } else {
+                            logArea.textContent += `✗ ${item.fileName}: ${item.error}\n`;
+                        }
+                    });
+                } else {
+                    logArea.textContent += `エラー: ${result.error}\n`;
+                }
+                
+            } catch (error) {
+                logArea.textContent += `予期しないエラー: ${error.message}\n`;
+            } finally {
+                // ボタンの状態を元に戻す
+                convertBtn.disabled = false;
+                convertBtn.textContent = '変換開始';
+                convertBtn.onclick = startConversion;
+                convertBtn.classList.remove('cancel-btn');
+                
+                // プログレスバーを非表示
+                document.getElementById('progress-bar').classList.add('hidden');
+                document.getElementById('progress-text').classList.add('hidden');
+            }
+        }
+
+        // 変換キャンセル
+        function cancelConversion() {
+            window.electronAPI.cancelConversion();
+            const convertBtn = document.getElementById('convert-btn');
+            convertBtn.disabled = true;
+            convertBtn.textContent = 'キャンセル中...';
+        }
+
+        // ファイル名書式をデフォルトに戻す
+        function resetFileNameFormat() {
+            const defaultFormat = '{YYYY}{MM}{DD}_{HH}{mm}{ss}_{CameraMaker}_{CameraModel}_{LensMaker}_{LensModel}_{FilmSimulation}_{OriginalName}';
+            document.getElementById('format-input').value = defaultFormat;
+            saveSettings();
+        }
+
+        // ファイル名書式入力のバリデーション
+        function validateFileNameFormat(input) {
+            // WindowsとmacOSでファイル名に使用できない文字を定義
+            // Windows: \ / : * ? " < > |
+            // macOS: :
+            // スラッシュ / はパス区切り文字なので、ファイル名には含めない
+            const invalidCharsRegex = /[\\/:*?"<>|]/g;
+            const originalValue = input.value;
+            const cleanedValue = originalValue.replace(invalidCharsRegex, '');
+
+            if (originalValue !== cleanedValue) {
+                input.value = cleanedValue;
+            }
+            saveSettings(); // 無効な文字が削除されたら設定を保存
+            updateFormatSample(); // サンプル表示を更新
+        }
+
+        // 文字列をクリーンアップ (main.jsからコピー)
+        function cleanString(str) {
+            if (!str) return '';
+
+            // ファイル名に使用できない文字を削除
+            str = str.replace(/[\\/:*?"<>|]/g, '');
+
+            // スペースをハイフンに
+            str = str.replace(/\s+/g, '-');
+
+            // テレコン使用時を考慮
+            str = str.replace(/-+\+-+/g, '+');
+
+            // 連続するアンダースコアを単一に
+            str = str.replace(/_+/g, '_');
+            
+            // 先頭と末尾のアンダースコアを削除
+            str = str.replace(/^_+|_+$/g, '');
+            
+            return str;
+        }
+
+        // サンプルデータ
+        const sampleExifData = {
+            Make: 'FUJIFILM',
+            Model: 'X-H2',
+            LensMake: 'FUJIFILM',
+            LensModel: 'XF35mmF1.4 R',
+            DateTimeOriginal: new Date(), // アプリ起動時間
+            CreateDate: new Date(),
+        };
+        const sampleOriginalName = 'DSCF0001';
+        const sampleFilmSim = 'CLASSIC CHROME';
+
+        // サンプル表示を更新
+        function updateFormatSample() {
+            const formatInput = document.getElementById('format-input');
+            const sampleDiv = document.getElementById('format-sample');
+            const currentFormat = formatInput.value;
+
+            // main.jsのgenerateNewFileName関数を模倣
+            let fileName = currentFormat;
+
+            const date = sampleExifData.DateTimeOriginal;
+            const dateValues = {
+                YYYY: date.getFullYear(),
+                MM: String(date.getMonth() + 1).padStart(2, '0'),
+                DD: String(date.getDate()).padStart(2, '0'),
+                HH: String(date.getHours()).padStart(2, '0'),
+                mm: String(date.getMinutes()).padStart(2, '0'),
+                ss: String(date.getSeconds()).padStart(2, '0'),
+            };
+
+            const skipSameLensMaker = document.getElementById('skip-same-lens-checkbox').checked;
+
+            const cameraMake = sampleExifData.Make;
+            const finalLensMake = (skipSameLensMaker && sampleExifData.LensMake === cameraMake) ? '' : sampleExifData.LensMake;
+
+            const tags = {
+                ...dateValues,
+                CameraMaker: cameraMake,
+                CameraModel: sampleExifData.Model,
+                LensMaker: finalLensMake,
+                LensModel: sampleExifData.LensModel,
+                FilmSimulation: sampleFilmSim,
+                OriginalName: sampleOriginalName,
+            };
+
+            for (const [tag, value] of Object.entries(tags)) {
+                fileName = fileName.replace(new RegExp(`\\{${tag}\\}`, 'g'), value);
+            }
+
+            fileName = cleanString(fileName);
+
+            sampleDiv.textContent = `サンプル: ${fileName}.jpg`;
+        }
+    </script>
+</body>
+</html>
