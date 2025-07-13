@@ -1,6 +1,6 @@
 {
   "name": "fuji-photo-renamer",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "富士フイルムの写真ファイルリネームツール",
   "main": "main.js",
   "scripts": {
@@ -26,16 +26,13 @@
       "LICENSE",
       "package.json"
     ],
-    "extraResources": [
-      {
-        "from": "node_modules/exiftool-vendored.pl/bin/",
-        "to": "bin",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ],
     "mac": {
+      "extraResources": [
+        {
+          "from": "node_modules/exiftool-vendored.pl/bin/",
+          "to": "bin"
+        }
+      ],
       "category": "public.app-category.photography",
       "target": [
         {
@@ -55,6 +52,12 @@
       ]
     },
     "win": {
+      "extraResources": [
+        {
+          "from": "node_modules/exiftool-vendored.exe/bin/",
+          "to": "bin"
+        }
+      ],
       "target": [
         {
           "target": "nsis",

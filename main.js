@@ -101,7 +101,8 @@ function createWindow() {
 
 app.whenReady().then(() => {
   if (app.isPackaged) {
-    exiftool.options.exiftoolPath = path.join(process.resourcesPath, 'bin/exiftool');
+    const exiftoolName = process.platform === 'win32' ? 'exiftool.exe' : 'exiftool';
+    exiftool.options.exiftoolPath = path.join(process.resourcesPath, `bin/${exiftoolName}`);
   }
   userDataPath = app.getPath('userData');
   createWindow();
