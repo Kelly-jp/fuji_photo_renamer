@@ -1,6 +1,6 @@
 {
   "name": "fuji-photo-renamer",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "富士フイルムの写真ファイルリネームツール",
   "main": "main.js",
   "scripts": {
