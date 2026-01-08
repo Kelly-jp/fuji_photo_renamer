@@ -85,9 +85,9 @@ function createWindow() {
   const icon = path.join(__dirname, 'assets/icon.svg');
   mainWindow = new BrowserWindow({
     width: 1000,
-    height: 800,
-    minWidth: 700, // 最小幅を設定
-    minHeight: 600, // 最小高さを設定
+    height: 900,
+    minWidth: 700,
+    minHeight: 600,
     icon: icon,
     webPreferences: {
       nodeIntegration: false,

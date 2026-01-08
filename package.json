@@ -1,6 +1,6 @@
 {
   "name": "fuji-photo-renamer",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "富士フイルムの写真ファイルリネームツール",
   "main": "main.js",
   "scripts": {
@@ -14,6 +14,7 @@
   "build": {
     "appId": "com.fujiphotorenamer.app",
     "productName": "FUJI Photo Renamer",
+    "copyright": "Copyright © 2026 Kelly-jp. All rights reserved.",
     "icon": "assets/icon.png",
     "directories": {
       "output": "dist"
@@ -75,13 +76,13 @@
     }
   },
   "devDependencies": {
-    "electron": "^37.2.0",
-    "electron-builder": "^24.6.4",
-    "archiver": "^6.0.1"
+    "archiver": "^7.0.1",
+    "electron": "^39.2.7",
+    "electron-builder": "^26.4.0"
   },
   "dependencies": {
-    "exiftool-vendored": "^25.0.0",
-    "fast-xml-parser": "^4.3.2",
-    "fs-extra": "^11.3.0"
+    "exiftool-vendored": "^34.3.0",
+    "fast-xml-parser": "^5.3.3",
+    "fs-extra": "^11.3.3"
   }
 }
